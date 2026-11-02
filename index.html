@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart — Classroom Screen Share</title>
-  <!-- PeerJS 1.5.4 from unpkg -->
+  <title>Classroom Screen Share - GitHub Pages & LAN Ready</title>
+  <!-- PeerJS CDN: Enables instant zero-backend WebRTC signaling on GitHub Pages -->
   <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <style>
     :root {
@@ -65,16 +65,14 @@
       position: sticky; top: 0; z-index: 100;
     }
     .header-logo { display: flex; align-items: center; gap: 10px; font-size: 18px; font-weight: 700; }
-    .badge-network {
-      background: linear-gradient(135deg, #10b981, #06b6d4); color: white;
+    .badge-lan {
+      background: linear-gradient(135deg, #3b82f6, #06b6d4); color: white;
       padding: 2px 8px; border-radius: 999px; font-size: 11px; font-weight: 600; text-transform: uppercase;
     }
     .status-dot {
       width: 8px; height: 8px; border-radius: 50%; display: inline-block;
       background-color: var(--accent-green); box-shadow: 0 0 8px var(--accent-green);
     }
-    .status-dot.yellow { background-color: var(--accent-amber); box-shadow: 0 0 8px var(--accent-amber); }
-    .status-dot.red { background-color: var(--accent-red); box-shadow: 0 0 8px var(--accent-red); }
 
     main.main-content {
       flex: 1; display: flex; flex-direction: column; padding: 24px;
@@ -126,23 +124,12 @@
     .btn-secondary:hover { background: #475569; }
     .btn-sm { padding: 6px 12px; font-size: 13px; width: auto; border-radius: var(--radius-sm); }
 
-    .btn-pulse {
-      animation: pulse-ring 1.5s infinite;
-      box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
-    }
-    @keyframes pulse-ring {
-      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7); }
-      70% { transform: scale(1.03); box-shadow: 0 0 0 10px rgba(245, 158, 11, 0); }
-      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
-    }
-
-    input[type="text"], textarea, select {
+    input[type="text"], textarea {
       width: 100%; padding: 12px 16px; background: var(--bg-primary);
       border: 1px solid var(--border-color); border-radius: var(--radius-md);
       color: var(--text-main); font-size: 15px; outline: none; transition: border-color 0.2s;
     }
-    select { cursor: pointer; }
-    input[type="text"]:focus, textarea:focus, select:focus { border-color: var(--accent-blue); }
+    input[type="text"]:focus, textarea:focus { border-color: var(--accent-blue); }
     .passcode-input {
       font-family: var(--font-mono); font-size: 32px; letter-spacing: 8px;
       text-align: center; font-weight: 700; color: #38bdf8;
@@ -168,31 +155,9 @@
     .stat-chip .stat-val { font-size: 15px; font-weight: 700; font-family: var(--font-mono); }
     .stat-chip .stat-lbl { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
 
-    /* Teacher host-status bar */
-    .host-status-bar {
-      background: rgba(15, 23, 42, 0.7);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm);
-      padding: 8px 14px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 12px;
-      font-family: var(--font-mono);
-      color: var(--text-muted);
-    }
-
     .controls-toolbar {
-      display: flex; gap: 8px; flex-wrap: wrap; background: var(--card-bg);
+      display: flex; gap: 10px; flex-wrap: wrap; background: var(--card-bg);
       border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 10px;
-      align-items: center;
-    }
-
-    .toolbar-select-group {
-      display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted);
-    }
-    .toolbar-select-group select {
-      padding: 5px 8px; font-size: 12px; border-radius: var(--radius-sm); width: auto;
     }
 
     .dashboard-main-layout { display: grid; grid-template-columns: 1fr 340px; gap: 18px; }
@@ -225,26 +190,13 @@
       padding: 8px 12px; background: var(--bg-primary); border: 1px solid var(--border-color);
       border-radius: var(--radius-sm); font-size: 13px;
     }
-    .relay-badge {
-      font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; font-family: var(--font-mono);
-    }
-    .relay-badge.direct { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    .relay-badge.turn { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
 
-    /* Viewer Container & Status Overlay */
     .viewer-container {
       position: relative; width: 100%; height: calc(100vh - 120px);
       background: #000; border-radius: var(--radius-lg); overflow: hidden;
       display: flex; align-items: center; justify-content: center;
     }
     .viewer-video { width: 100%; height: 100%; object-fit: contain; }
-
-    .viewer-status-overlay {
-      position: absolute; inset: 0; background: rgba(15, 23, 42, 0.88);
-      backdrop-filter: blur(8px); display: flex; flex-direction: column;
-      align-items: center; justify-content: center; gap: 14px; z-index: 45;
-      text-align: center; padding: 20px;
-    }
 
     .viewer-hud {
       position: absolute; top: 16px; left: 16px; background: rgba(15, 23, 42, 0.85);
@@ -271,44 +223,6 @@
       max-width: 600px; width: 90%; display: flex; align-items: center; gap: 14px;
     }
 
-    /* On-Screen Diagnostic Debug Panel on Join Screen */
-    .debug-panel {
-      margin-top: 24px;
-      max-width: 680px;
-      width: 100%;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius-md);
-      padding: 16px;
-      text-align: left;
-      font-size: 13px;
-    }
-    .debug-panel-header {
-      display: flex; justify-content: space-between; align-items: center;
-      cursor: pointer; user-select: none; font-weight: 700;
-    }
-    .debug-status-cluster {
-      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 10px; margin: 12px 0; font-family: var(--font-mono); font-size: 11px;
-    }
-    .debug-chip {
-      background: var(--bg-primary); border: 1px solid var(--border-color);
-      padding: 6px 10px; border-radius: var(--radius-sm);
-    }
-    .debug-chip-lbl { color: var(--text-muted); font-size: 9px; text-transform: uppercase; }
-    .debug-chip-val { font-weight: 700; margin-top: 2px; }
-
-    .debug-log-box {
-      background: #000; border: 1px solid var(--border-color);
-      border-radius: var(--radius-sm); padding: 10px; height: 140px;
-      overflow-y: auto; font-family: var(--font-mono); font-size: 11px;
-      color: #38bdf8; line-height: 1.4;
-    }
-    .debug-log-entry { margin-bottom: 2px; word-break: break-all; }
-    .debug-log-entry.warn { color: var(--accent-amber); }
-    .debug-log-entry.err { color: var(--accent-red); }
-
-    /* Modals */
     .modal-backdrop {
       position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75);
       backdrop-filter: blur(4px); display: flex; align-items: center;
@@ -333,7 +247,7 @@
 <body>
   <div id="toast-container"></div>
 
-  <!-- Announcement Banner Overlay -->
+  <!-- Announcement Banner -->
   <div id="announcement-banner" class="announcement-banner" style="display: none;">
     <div style="font-size: 22px;">📢</div>
     <div style="flex: 1;">
@@ -345,12 +259,11 @@
 
   <header class="app-header">
     <div class="header-logo">
-      <span>🖥️ Smart — Classroom Screen Share</span>
-      <span class="badge-network" id="network-badge">STUN/TURN Ready</span>
+      <span>🖥️ Classroom Screen Share</span>
+      <span class="badge-lan">WebRTC Zero-Server</span>
     </div>
-    <div style="font-size: 13px; color: var(--text-muted); display: flex; align-items: center; gap: 8px;">
-      <span class="status-dot" id="header-status-dot"></span>
-      <span id="header-status-text">Ready</span>
+    <div style="font-size: 13px; color: var(--text-muted);">
+      <span class="status-dot"></span> Ready on GitHub Pages / LAN
     </div>
   </header>
 
@@ -358,21 +271,21 @@
     <!-- 1. LANDING VIEW -->
     <section id="view-landing" class="view-panel active">
       <div class="landing-hero">
-        <h1>High-Performance Classroom Screen Distribution</h1>
-        <p class="subtitle">Broadcast your screen with synchronized system audio across any network, mobile data, home Wi-Fi, or classroom LAN with sub-second latency.</p>
+        <h1>Direct Classroom Screen & Audio Sharing</h1>
+        <p class="subtitle">Broadcast your screen with synchronized system audio to student computers using browser-native WebRTC. Works directly from GitHub Pages or any local folder!</p>
         
         <div class="landing-cards">
           <div class="action-card">
             <div class="card-icon">📤</div>
             <h3>Teacher / Presenter</h3>
-            <p>Generate a 6-digit passcode and stream your screen, window, or tab with stereo audio.</p>
+            <p>Generate a 6-digit passcode and stream your screen, app window, or tab with stereo sound.</p>
             <button class="btn btn-primary" onclick="App.startAsSharer()">SHARE MY SCREEN</button>
           </div>
 
           <div class="action-card">
             <div class="card-icon">📥</div>
             <h3>Student / Viewer</h3>
-            <p>Enter the 6-digit passcode to join the live broadcast from any computer or mobile browser.</p>
+            <p>Enter the 6-digit passcode to join the live classroom screen broadcast.</p>
             <button class="btn btn-success" onclick="App.switchView('view-join')">JOIN SESSION</button>
           </div>
         </div>
@@ -382,7 +295,7 @@
     <!-- 2. JOIN VIEW -->
     <section id="view-join" class="view-panel">
       <div class="landing-hero">
-        <div class="action-card" style="max-width: 440px; width: 100%;">
+        <div class="action-card" style="max-width: 420px; width: 100%;">
           <div class="card-icon">🔑</div>
           <h3>Enter Session Code</h3>
           <p>Type the 6-digit code shown on the teacher's screen.</p>
@@ -394,39 +307,7 @@
 
           <div style="display: flex; gap: 10px; width: 100%;">
             <button class="btn btn-secondary" onclick="App.switchView('view-landing')">Back</button>
-            <button class="btn btn-primary" id="btn-join-session" onclick="App.joinAsViewer()">JOIN SESSION</button>
-          </div>
-        </div>
-
-        <!-- Task 3: On-screen Diagnostic Debug Panel on Join Screen -->
-        <div class="debug-panel" id="join-debug-panel">
-          <div class="debug-panel-header" onclick="App.toggleDebugPanel()">
-            <span>🛠️ Connection Diagnostics & Live Event Log</span>
-            <span id="debug-toggle-indicator">▼</span>
-          </div>
-          <div id="debug-panel-content">
-            <div class="debug-status-cluster">
-              <div class="debug-chip">
-                <div class="debug-chip-lbl">TURN Endpoint</div>
-                <div class="debug-chip-val" id="dbg-turn-endpoint">Checking...</div>
-              </div>
-              <div class="debug-chip">
-                <div class="debug-chip-lbl">ICE Servers</div>
-                <div class="debug-chip-val" id="dbg-ice-count">0 servers</div>
-              </div>
-              <div class="debug-chip">
-                <div class="debug-chip-lbl">ICE Connection</div>
-                <div class="debug-chip-val" id="dbg-ice-state">Idle</div>
-              </div>
-              <div class="debug-chip">
-                <div class="debug-chip-lbl">Candidates</div>
-                <div class="debug-chip-val" id="dbg-candidates">host:0, srflx:0, relay:0</div>
-              </div>
-            </div>
-            <div class="debug-log-box" id="debug-log-stream"></div>
-            <div style="display: flex; justify-content: flex-end; margin-top: 8px;">
-              <button class="btn btn-sm btn-secondary" onclick="App.copyDebugLog()">📋 Copy Debug Log</button>
-            </div>
+            <button class="btn btn-primary" onclick="App.joinAsViewer()">JOIN SESSION</button>
           </div>
         </div>
       </div>
@@ -436,14 +317,10 @@
     <section id="view-waiting" class="view-panel">
       <div class="landing-hero">
         <div class="action-card" style="max-width: 440px; width: 100%;">
-          <div class="card-icon" style="animation: pulse-ring 1.5s infinite;">⏳</div>
+          <div class="card-icon">⏳</div>
           <h3>Waiting for Teacher Approval</h3>
-          <p id="waiting-status-detail">Connecting to teacher's computer across the network...</p>
-          <div class="stat-chip" style="margin-bottom: 16px;">
-            <span class="stat-lbl">Your Device</span>
-            <span class="stat-val" id="waiting-pc-name">PC-001</span>
-          </div>
-          <button class="btn btn-danger" onclick="App.leaveSession()">Cancel Request</button>
+          <p>Your join request has been sent to the teacher. You will be connected as soon as they approve your computer.</p>
+          <button class="btn btn-danger" onclick="App.leaveSession()">Cancel</button>
         </div>
       </div>
     </section>
@@ -453,7 +330,7 @@
       <div class="dashboard-grid">
         <div class="session-header-bar">
           <div class="code-display-box">
-            <span style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Passcode:</span>
+            <span style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Code:</span>
             <span class="code-badge" id="teacher-session-code">482913</span>
             <button class="btn btn-sm btn-secondary" onclick="App.copyCode()">📋 Copy</button>
           </div>
@@ -465,48 +342,17 @@
             </div>
             <div class="stat-chip">
               <span class="stat-val" id="teacher-fps">30 fps</span>
-              <span class="stat-lbl">Capture Rate</span>
+              <span class="stat-lbl">Capture FPS</span>
             </div>
           </div>
         </div>
 
-        <!-- Teacher Status Bar (#host-status) -->
-        <div class="host-status-bar" id="host-status">
-          <span><span class="status-dot"></span> <strong>Connection:</strong> <span id="host-status-connection">Signaling Ready</span></span>
-          <span><strong>Source:</strong> <span id="host-status-source">Active Screen</span></span>
-          <span><strong>Relay Path:</strong> <span id="host-status-relay">Direct / STUN</span></span>
-        </div>
-
-        <!-- Teacher Quick Actions Toolbar -->
         <div class="controls-toolbar">
           <button class="btn btn-danger btn-sm" onclick="App.stopSharing()">⏹️ Stop Sharing</button>
           <button class="btn btn-secondary btn-sm" id="btn-toggle-audio" onclick="App.toggleAudioMute()">🔊 Mute Audio</button>
           <button class="btn btn-secondary btn-sm" id="btn-toggle-video" onclick="App.toggleVideoPause()">⏸️ Pause Video</button>
-          
-          <!-- Requirement 4: Change Shared Screen / Window / Tab -->
-          <button class="btn btn-secondary btn-sm" id="btn-change-source" onclick="App.changeSharedSource()">🔄 Change Window / Tab</button>
-          <button class="btn btn-secondary btn-sm" id="btn-toggle-preview" onclick="App.toggleLocalPreview()">👁️ Hide Preview</button>
           <button class="btn btn-primary btn-sm" onclick="App.openAnnouncementModal()">📢 Announcement</button>
           <button class="btn btn-success btn-sm" onclick="App.openFileModal()">📁 Send File</button>
-
-          <!-- Requirement 6: Performance Controls -->
-          <div class="toolbar-select-group">
-            <label for="select-fps">FPS:</label>
-            <select id="select-fps" onchange="App.applyFpsSelection(this.value)">
-              <option value="15">15 FPS</option>
-              <option value="30" selected>30 FPS</option>
-              <option value="60">60 FPS</option>
-            </select>
-          </div>
-
-          <div class="toolbar-select-group">
-            <label for="select-hint">Mode:</label>
-            <select id="select-hint" onchange="App.applyContentHint(this.value)">
-              <option value="detail" selected>Sharp Text</option>
-              <option value="motion">Smooth Motion</option>
-            </select>
-          </div>
-
           <div style="flex: 1;"></div>
           <button class="btn btn-danger btn-sm" onclick="App.endSession()">❌ End Session</button>
         </div>
@@ -519,10 +365,9 @@
           <div class="participants-panel">
             <div class="panel-header">
               <h3>Viewers & Approvals</h3>
-              <span class="badge-network" id="pending-badge-count">0 Pending</span>
+              <span class="badge-lan" id="pending-badge-count">0 Pending</span>
             </div>
 
-            <!-- Waiting Room Pending Section -->
             <div id="waiting-room-section" class="waiting-list-section" style="display: none;">
               <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: 700; color: var(--accent-amber);">
                 <span>PENDING APPROVAL</span>
@@ -531,7 +376,6 @@
               <div id="waiting-cards-container"></div>
             </div>
 
-            <!-- Connected Viewers List -->
             <div class="participants-list-scroll" id="connected-viewers-container">
               <div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px;">
                 No viewers yet. Share code <strong id="hint-code">482913</strong>.
@@ -547,27 +391,13 @@
       <div class="viewer-container" id="viewer-container">
         <video id="viewer-video" class="viewer-video" autoplay playsinline></video>
 
-        <!-- Requirement 5: Viewer Connection Status Overlay with Retry -->
-        <div id="viewer-status-overlay" class="viewer-status-overlay" style="display: none;">
-          <div style="font-size: 32px;" id="viewer-status-icon">🔄</div>
-          <h3 id="viewer-status-heading">Connecting to Screen Stream...</h3>
-          <p id="viewer-status-desc" style="color: var(--text-muted); max-width: 400px; font-size: 13px;">Establishing WebRTC peer connection through network firewalls...</p>
-          <div style="display: flex; gap: 10px;">
-            <button class="btn btn-sm btn-primary" onclick="App.retryViewerConnection()">🔄 Retry Connection</button>
-            <button class="btn btn-sm btn-danger" onclick="App.leaveSession()">Leave</button>
-          </div>
-        </div>
-
-        <!-- Audio Unlock Overlay -->
         <div id="audio-unlock-overlay" class="audio-unlock-overlay" style="display: none;">
           <div style="font-size: 32px;">🔊</div>
           <h3>Enable Classroom Audio</h3>
-          <p style="color: var(--text-muted); font-size: 13px;">Click to enable synchronized stereo sound from teacher's screen.</p>
           <button class="btn btn-success" style="width: auto;" onclick="App.unlockAudio()">Unmute & Play Audio</button>
         </div>
 
-        <!-- Viewer Diagnostics HUD -->
-        <div class="viewer-hud" id="viewer-hud">
+        <div class="viewer-hud">
           <div style="display: flex; align-items: center; gap: 4px;">
             <span class="status-dot"></span> LIVE
           </div>
@@ -584,12 +414,11 @@
             <span id="hud-bitrate">5.2 Mbps</span>
           </div>
           <div class="hud-stat-item">
-            <span>Latency (RTT)</span>
+            <span>Latency</span>
             <span id="hud-latency">12 ms</span>
           </div>
         </div>
 
-        <!-- Floating Controls Bar -->
         <div class="viewer-floating-controls">
           <button class="btn btn-sm btn-secondary" onclick="App.toggleFullscreen()">⛶ Fullscreen</button>
           <button class="btn btn-sm btn-secondary" id="btn-viewer-mute" onclick="App.toggleViewerMute()">🔊 Volume</button>
@@ -606,7 +435,6 @@
         <h3>📁 High-Speed File Transfer</h3>
         <button class="btn btn-sm btn-secondary" onclick="App.closeFileModal()">✕</button>
       </div>
-      <p style="font-size: 12px; color: var(--text-muted); margin-bottom: 10px;">Max file size: 50 MB. Files are encrypted and delivered directly to approved viewers.</p>
       <input type="file" id="file-input" style="padding: 10px; background: var(--bg-primary); border-radius: 6px;">
       <div id="file-progress-box" style="display: none; margin-top: 12px;">
         <div style="display: flex; justify-content: space-between; font-size: 12px; font-family: var(--font-mono);">
@@ -640,183 +468,22 @@
   </div>
 
   <script>
-    // =========================================================================
-    // CONFIGURATION BLOCK (Requirement 2)
-    // =========================================================================
-    const CONFIG = {
-      // Set to your Cloudflare Worker endpoint URL (e.g., https://smart-turn-service.<subdomain>.workers.dev/ice)
-      TURN_ENDPOINT: "", 
-      CREDENTIAL_REFRESH_MS: 20 * 60 * 1000, // 20 minutes
-      MAX_FILE_SIZE_BYTES: 50 * 1024 * 1024, // 50 MB Cap (Requirement 7)
-      FALLBACK_ICE_SERVERS: [
-        { urls: 'stun:stun.l.google.com:19302' },
-        { urls: 'stun:stun1.l.google.com:19302' },
-        { urls: 'stun:stun2.l.google.com:19302' },
-        {
-          urls: [
-            'turn:openrelay.metered.ca:80',
-            'turn:openrelay.metered.ca:443',
-            'turn:openrelay.metered.ca:443?transport=tcp'
-          ],
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        }
-      ]
-    };
-
-    // Diagnostics Logger helper
-    const Logger = {
-      entries: [],
-      candidateStats: { host: 0, srflx: 0, relay: 0 },
-      log(msg, type = 'info') {
-        const time = new Date().toLocaleTimeString();
-        const entry = `[${time}] ${msg}`;
-        this.entries.push({ time, msg, type });
-        console.log(`[ScreenShare] ${entry}`);
-
-        const box = document.getElementById('debug-log-stream');
-        if (box) {
-          const div = document.createElement('div');
-          div.className = `debug-log-entry ${type}`;
-          div.innerText = entry;
-          box.appendChild(div);
-          box.scrollTop = box.scrollHeight;
-        }
-      },
-      recordCandidate(type) {
-        if (type in this.candidateStats) {
-          this.candidateStats[type]++;
-          const el = document.getElementById('dbg-candidates');
-          if (el) {
-            el.innerText = `host:${this.candidateStats.host}, srflx:${this.candidateStats.srflx}, relay:${this.candidateStats.relay}`;
-          }
-        }
-      },
-      setIceState(state) {
-        const el = document.getElementById('dbg-ice-state');
-        if (el) el.innerText = state;
-      }
-    };
-
-    // =========================================================================
-    // ICE / TURN MANAGER (Requirement 2)
-    // =========================================================================
-    class IceManager {
-      constructor() {
-        this.currentIceServers = [...CONFIG.FALLBACK_ICE_SERVERS];
-        this.refreshTimer = null;
-        this.forceRelay = new URLSearchParams(window.location.search).get('relay') === '1';
-      }
-
-      async getPeerConfig() {
-        await this.fetchTurnServers();
-
-        const config = {
-          iceServers: this.currentIceServers,
-          iceCandidatePoolSize: 10
-        };
-
-        if (this.forceRelay) {
-          Logger.log('?relay=1 active: Forcing iceTransportPolicy="relay" for testing', 'warn');
-          config.iceTransportPolicy = 'relay';
-        }
-
-        return {
-          debug: 1,
-          config
-        };
-      }
-
-      async fetchTurnServers() {
-        const endpointDisplay = document.getElementById('dbg-turn-endpoint');
-        const countDisplay = document.getElementById('dbg-ice-count');
-
-        if (!CONFIG.TURN_ENDPOINT) {
-          Logger.log('No custom TURN_ENDPOINT configured. Using default Global STUN + OpenRelay TURN fallback.', 'info');
-          if (endpointDisplay) endpointDisplay.innerText = 'Global Fallback (STUN + TURN)';
-          if (countDisplay) countDisplay.innerText = `${this.currentIceServers.length} servers`;
-          return;
-        }
-
-        if (endpointDisplay) endpointDisplay.innerText = 'Fetching...';
-        Logger.log(`Fetching short-lived ICE credentials from ${CONFIG.TURN_ENDPOINT}...`);
-
-        try {
-          const res = await fetch(CONFIG.TURN_ENDPOINT, { method: 'GET', cache: 'no-store' });
-          if (!res.ok) throw new Error(`HTTP ${res.status}`);
-          const data = await res.json();
-
-          if (Array.isArray(data.iceServers) && data.iceServers.length > 0) {
-            // Filter out port-53 URLs (Requirement 2)
-            const sanitized = data.iceServers.map(server => {
-              if (Array.isArray(server.urls)) {
-                return { ...server, urls: server.urls.filter(u => !u.includes(':53')) };
-              } else if (typeof server.urls === 'string') {
-                return server.urls.includes(':53') ? null : server;
-              }
-              return server;
-            }).filter(Boolean);
-
-            this.currentIceServers = sanitized;
-            Logger.log(`Successfully loaded ${this.currentIceServers.length} ICE server configs from Worker!`);
-            if (endpointDisplay) endpointDisplay.innerText = 'Active (Cloudflare)';
-            if (countDisplay) countDisplay.innerText = `${this.currentIceServers.length} Active`;
-          }
-        } catch (err) {
-          Logger.log(`Failed to fetch from TURN_ENDPOINT: ${err.message}. Retaining STUN fallback.`, 'warn');
-          if (endpointDisplay) endpointDisplay.innerText = 'Fetch Failed (STUN fallback)';
-        }
-
-        this.scheduleCredentialRefresh();
-      }
-
-      scheduleCredentialRefresh() {
-        if (this.refreshTimer) clearInterval(this.refreshTimer);
-        this.refreshTimer = setInterval(async () => {
-          Logger.log('Refreshing short-lived TURN credentials (20 min interval)...');
-          await this.fetchTurnServers();
-          App.pushNewIceConfigToLivePeers(this.currentIceServers);
-        }, CONFIG.CREDENTIAL_REFRESH_MS);
-      }
-    }
-
-    // =========================================================================
-    // MAIN APPLICATION
-    // =========================================================================
     const App = {
-      peer: null,
-      role: null,
-      passcode: null,
-      localStream: null,
-      videoTrack: null,
-      audioTrack: null,
-      silentAudioTrack: null,
-      isAudioMuted: false,
-      isVideoPaused: false,
-      iceManager: new IceManager(),
-      participants: new Map(), // peerId -> { peerId, nickname, status, conn, call, retryCount }
-      activeCalls: new Map(),
-      statsInterval: null,
-      currentViewerPC: null,
+      peer: null, role: null, passcode: null, localStream: null,
+      videoTrack: null, audioTrack: null, isAudioMuted: false, isVideoPaused: false,
+      participants: new Map(), activeCalls: new Map(), statsInterval: null,
 
-      init() {
-        Logger.log('Smart Classroom Screen Share initializing...');
-        this.iceManager.fetchTurnServers();
-      },
-
-      // Navigation View Router
+      init() { console.log('Classroom Screen Share initialized.'); },
       switchView(viewId) {
         document.querySelectorAll('.view-panel').forEach(el => el.classList.remove('active'));
-        const target = document.getElementById(viewId);
-        if (target) target.classList.add('active');
+        document.getElementById(viewId)?.classList.add('active');
       },
-
       showToast(msg, type = 'info') {
         const container = document.getElementById('toast-container');
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
-        toast.innerHTML = `<span>${icon}</span><span>${this.escapeHtml(msg)}</span>`;
+        toast.innerHTML = `<span>${icon}</span><span>${msg}</span>`;
         container.appendChild(toast);
         setTimeout(() => {
           toast.style.opacity = '0'; toast.style.transform = 'translateX(100%)';
@@ -825,313 +492,63 @@
         }, 3500);
       },
 
-      // Security Helper: Escape HTML strings (Requirement 7)
-      escapeHtml(str) {
-        if (typeof str !== 'string') return '';
-        return str.replace(/[&<>"']/g, (m) => ({
-          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
-        }[m]));
-      },
-
-      // Generate Cryptographically Secure 6-Digit Passcode (Requirement 7)
-      generateSecurePasscode() {
-        const array = new Uint32Array(1);
-        window.crypto.getRandomValues(array);
-        // Random number between 100000 and 999999
-        return (100000 + (array[0] % 900000)).toString();
-      },
-
-      // Silent placeholder audio track for seamless replaceTrack() swaps (Requirement 4)
-      createSilentAudioTrack() {
-        try {
-          const ctx = new (window.AudioContext || window.webkitAudioContext)();
-          const dest = ctx.createMediaStreamDestination();
-          return dest.stream.getAudioTracks()[0];
-        } catch (e) {
-          Logger.log('Could not create silent AudioContext track: ' + e.message, 'warn');
-          return null;
-        }
-      },
-
-      // =======================================================================
-      // TEACHER WORKFLOW
-      // =======================================================================
+      // Teacher Screen Capture
       async startAsSharer() {
         try {
-          Logger.log('Requesting screen capture stream...');
           const stream = await navigator.mediaDevices.getDisplayMedia({
             video: { displaySurface: 'monitor', frameRate: { ideal: 30, max: 60 } },
             audio: true
           });
-
           this.localStream = stream;
           this.videoTrack = stream.getVideoTracks()[0];
           this.audioTrack = stream.getAudioTracks()[0] || null;
-
-          // Silent audio track ensures RTCRtpSender exists for audio swapping (Requirement 4)
-          this.silentAudioTrack = this.createSilentAudioTrack();
-          if (!this.audioTrack && this.silentAudioTrack) {
-            this.localStream.addTrack(this.silentAudioTrack);
-            Logger.log('No system audio selected; attached silent placeholder audio track.');
-          }
-
-          // Handle user stopping share via browser floating bar
-          this.videoTrack.onended = () => this.handleNativeShareEnded();
-
-          // Render local preview
+          this.videoTrack.onended = () => this.stopSharing();
           document.getElementById('sharer-preview-video').srcObject = stream;
 
-          // Generate code & configure
-          this.passcode = this.generateSecurePasscode();
+          this.passcode = Math.floor(100000 + Math.random() * 900000).toString();
           this.role = 'sharer';
 
           document.getElementById('teacher-session-code').innerText = this.passcode;
           document.getElementById('hint-code').innerText = this.passcode;
-          document.getElementById('host-status-connection').innerText = 'Starting PeerJS...';
 
-          const peerConfig = await this.iceManager.getPeerConfig();
           const peerId = `classroom-host-${this.passcode}`;
-          
-          this.peer = new Peer(peerId, peerConfig);
+          this.peer = new Peer(peerId, { debug: 1 });
 
           this.peer.on('open', () => {
-            Logger.log(`Teacher session open. Host Peer ID: ${peerId}`);
             this.switchView('view-sharer');
             this.showToast(`Session active! Passcode: ${this.passcode}`, 'success');
-            document.getElementById('host-status-connection').innerText = 'Live (Listening)';
-            document.getElementById('header-status-text').innerText = 'Live Broadcast';
           });
 
           this.peer.on('connection', (conn) => {
             conn.on('data', (data) => this.handleSharerIncomingData(conn, data));
             conn.on('close', () => this.removeParticipant(conn.peer));
           });
-
-          this.peer.on('error', (err) => {
-            Logger.log(`Teacher Peer error: ${err.type}`, 'err');
-            this.showToast(`Network error: ${err.type}`, 'error');
-            document.getElementById('host-status-connection').innerText = `Error: ${err.type}`;
-          });
-
-          this.startHostStatsMonitor();
-
         } catch (err) {
-          if (err.name === 'NotAllowedError') {
-            this.showToast('Screen capture permission cancelled.', 'warning');
-          } else {
-            this.showToast(`Error: ${err.message}`, 'error');
-          }
+          this.showToast(err.name === 'NotAllowedError' ? 'Permission cancelled.' : err.message, 'error');
         }
       },
 
-      // Handle Browser Native "Stop Sharing" Bar (Requirement 4)
-      handleNativeShareEnded() {
-        Logger.log('Screen source ended by user via browser banner. Session remains open.', 'warn');
-        this.showToast('Screen broadcast ended. Session remains open for viewers.', 'warning');
-        document.getElementById('host-status-source').innerText = 'None (Paused)';
-        
-        // Pulse the Change Source button to prompt action
-        const btnChange = document.getElementById('btn-change-source');
-        if (btnChange) btnChange.classList.add('btn-pulse');
-      },
-
-      // Change Shared Screen / Window / Tab (Requirement 4)
-      async changeSharedSource() {
-        const btnChange = document.getElementById('btn-change-source');
-        if (btnChange) btnChange.classList.remove('btn-pulse');
-
-        try {
-          Logger.log('Picking new screen / window / tab source...');
-          const newStream = await navigator.mediaDevices.getDisplayMedia({
-            video: { displaySurface: 'monitor', frameRate: { ideal: 30, max: 60 } },
-            audio: true
-          });
-
-          const newVideoTrack = newStream.getVideoTracks()[0];
-          const newAudioTrack = newStream.getAudioTracks()[0] || null;
-
-          // Preserve mute / pause states
-          newVideoTrack.enabled = !this.isVideoPaused;
-          if (newAudioTrack) {
-            newAudioTrack.enabled = !this.isAudioMuted;
-          }
-
-          newVideoTrack.onended = () => this.handleNativeShareEnded();
-
-          // Swap tracks on all approved viewers via RTCRtpSender.replaceTrack()
-          for (const [peerId, call] of this.activeCalls.entries()) {
-            if (call && call.peerConnection) {
-              const senders = call.peerConnection.getSenders();
-              
-              // Video sender replaceTrack
-              const videoSender = senders.find(s => s.track && s.track.kind === 'video');
-              if (videoSender) {
-                await videoSender.replaceTrack(newVideoTrack);
-              }
-
-              // Audio sender replaceTrack (swaps silent track for real audio or vice versa)
-              const audioSender = senders.find(s => s.track && s.track.kind === 'audio');
-              if (audioSender) {
-                const effectiveAudio = newAudioTrack || this.silentAudioTrack;
-                if (effectiveAudio) await audioSender.replaceTrack(effectiveAudio);
-              }
-            }
-          }
-
-          // Stop old tracks
-          if (this.videoTrack) this.videoTrack.stop();
-          if (this.audioTrack) this.audioTrack.stop();
-
-          this.videoTrack = newVideoTrack;
-          this.audioTrack = newAudioTrack;
-          this.localStream = newStream;
-
-          // Update local preview
-          document.getElementById('sharer-preview-video').srcObject = newStream;
-          document.getElementById('host-status-source').innerText = 'Active Screen';
-          this.showToast('Screen source updated for all viewers!', 'success');
-
-          // Re-apply FPS and contentHint
-          this.applyFpsSelection(document.getElementById('select-fps').value);
-          this.applyContentHint(document.getElementById('select-hint').value);
-
-        } catch (err) {
-          if (err.name === 'NotAllowedError') {
-            Logger.log('User cancelled picker; keeping current screen share.');
-            this.showToast('Window picker cancelled. Current share preserved.', 'info');
-          } else {
-            this.showToast(`Source change error: ${err.message}`, 'error');
-          }
-        }
-      },
-
-      // Apply Performance contentHint & degradationPreference (Requirement 6)
-      applyContentHint(mode) {
-        if (!this.videoTrack) return;
-        try {
-          this.videoTrack.contentHint = mode; // 'detail' for text, 'motion' for video
-          for (const call of this.activeCalls.values()) {
-            if (call && call.peerConnection) {
-              const videoSender = call.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
-              if (videoSender) {
-                const params = videoSender.getParameters();
-                params.degradationPreference = mode === 'detail' ? 'maintain-resolution' : 'maintain-framerate';
-                videoSender.setParameters(params);
-              }
-            }
-          }
-          Logger.log(`Applied contentHint mode: ${mode}`);
-        } catch (e) {
-          Logger.log('Could not apply contentHint: ' + e.message, 'warn');
-        }
-      },
-
-      // Apply FPS Selection (Requirement 6)
-      applyFpsSelection(fpsVal) {
-        const fps = parseInt(fpsVal, 10);
-        if (this.videoTrack) {
-          try {
-            this.videoTrack.applyConstraints({ frameRate: { ideal: fps, max: fps } });
-            document.getElementById('teacher-fps').innerText = `${fps} fps`;
-            Logger.log(`Applied capture framerate: ${fps} FPS`);
-          } catch (e) {
-            Logger.log('Could not set frameRate constraint: ' + e.message, 'warn');
-          }
-        }
-      },
-
-      // Bitrate management based on participant count (Requirement 6)
-      async adaptBitrates(viewerCount) {
-        let maxBitrate = 5_000_000; // 5 Mbps default
-        if (viewerCount > 15) maxBitrate = 1_500_000; // 1.5 Mbps
-        else if (viewerCount > 5) maxBitrate = 3_000_000; // 3 Mbps
-
-        for (const call of this.activeCalls.values()) {
-          if (call && call.peerConnection) {
-            const sender = call.peerConnection.getSenders().find(s => s.track && s.track.kind === 'video');
-            if (sender) {
-              const params = sender.getParameters();
-              if (params.encodings && params.encodings[0]) {
-                params.encodings[0].maxBitrate = maxBitrate;
-                try {
-                  await sender.setParameters(params);
-                } catch (e) {}
-              }
-            }
-          }
-        }
-      },
-
-      // Teacher Incoming Signaling Message Handler (Requirement 7: Validation)
       handleSharerIncomingData(conn, data) {
-        if (!data || typeof data !== 'object' || typeof data.type !== 'string') {
-          Logger.log('Rejected invalid signaling message payload', 'warn');
-          return;
-        }
-
         if (data.type === 'JOIN_REQUEST') {
-          const rawNick = data.nickname || 'Student PC';
-          const safeNick = this.escapeHtml(rawNick).slice(0, 30);
-
-          this.participants.set(conn.peer, {
-            peerId: conn.peer,
-            nickname: safeNick,
-            status: 'pending',
-            conn,
-            call: null,
-            retryCount: 0
-          });
+          this.participants.set(conn.peer, { peerId: conn.peer, nickname: data.nickname || 'Student PC', status: 'pending', conn });
           this.updateSharerViewerList();
-          this.showToast(`${safeNick} requested to join`, 'info');
+          this.showToast(`${data.nickname} requested to join`, 'info');
         }
       },
 
-      // Approve Viewer & Transmit Media Link
       approveViewer(peerId) {
         const p = this.participants.get(peerId);
         if (!p) return;
-
         p.status = 'approved';
         p.conn.send({ type: 'APPROVED' });
-
-        this.callViewer(peerId);
+        const call = this.peer.call(peerId, this.localStream);
+        this.activeCalls.set(peerId, call);
         this.updateSharerViewerList();
-        this.adaptBitrates(this.participants.size);
         this.showToast(`Approved ${p.nickname}`, 'success');
       },
 
-      // Establish / Re-call media link with up to 3 automatic retries (Requirement 5)
-      callViewer(peerId) {
-        const p = this.participants.get(peerId);
-        if (!p) return;
-
-        Logger.log(`Calling viewer ${p.nickname} (${peerId})...`);
-        const effectiveStream = this.localStream;
-        const call = this.peer.call(peerId, effectiveStream);
-        p.call = call;
-        this.activeCalls.set(peerId, call);
-
-        if (call && call.peerConnection) {
-          call.peerConnection.oniceconnectionstatechange = () => {
-            const state = call.peerConnection.iceConnectionState;
-            Logger.log(`ICE state for ${p.nickname}: ${state}`);
-            
-            if (state === 'failed' || state === 'disconnected') {
-              if (p.retryCount < 3) {
-                p.retryCount++;
-                Logger.log(`Auto re-calling ${p.nickname} (attempt ${p.retryCount}/3)...`, 'warn');
-                setTimeout(() => this.callViewer(peerId), 1500);
-              }
-            }
-            this.updateSharerViewerList();
-          };
-        }
-      },
-
       approveAll() {
-        this.participants.forEach((p, id) => {
-          if (p.status === 'pending') this.approveViewer(id);
-        });
+        this.participants.forEach((p, id) => { if (p.status === 'pending') this.approveViewer(id); });
       },
 
       rejectViewer(peerId) {
@@ -1148,11 +565,9 @@
         this.activeCalls.delete(peerId);
         this.participants.delete(peerId);
         this.updateSharerViewerList();
-        this.adaptBitrates(this.participants.size);
       },
 
-      // Render Participant List & Detect Candidate Pair Type (Requirement 5)
-      async updateSharerViewerList() {
+      updateSharerViewerList() {
         const active = Array.from(this.participants.values()).filter(p => p.status === 'approved');
         const pending = Array.from(this.participants.values()).filter(p => p.status === 'pending');
 
@@ -1174,70 +589,23 @@
           `).join('');
         } else {
           waitingSection.style.display = 'none';
-          waitingCards.innerHTML = '';
         }
 
         const connectedContainer = document.getElementById('connected-viewers-container');
         if (active.length === 0) {
           connectedContainer.innerHTML = `<div style="color: var(--text-muted); font-size: 13px; text-align: center; padding: 20px;">No viewers connected yet. Share code <strong style="color: #38bdf8;">${this.passcode}</strong>.</div>`;
         } else {
-          let listHtml = '';
-          for (const p of active) {
-            let relayType = 'direct';
-            let iceState = 'connected';
-            if (p.call && p.call.peerConnection) {
-              iceState = p.call.peerConnection.iceConnectionState;
-              relayType = await this.detectRelayType(p.call.peerConnection);
-            }
-            listHtml += `
-              <div class="participant-item">
-                <div>
-                  <span>💻 <strong>${p.nickname}</strong></span>
-                  <span class="relay-badge ${relayType}">${relayType.toUpperCase()}</span>
-                  <span style="font-size:10px; color:var(--text-muted); margin-left:4px;">(${iceState})</span>
-                </div>
-                <button class="btn btn-sm btn-danger" onclick="App.rejectViewer('${p.peerId}')">Kick</button>
-              </div>
-            `;
-          }
-          connectedContainer.innerHTML = listHtml;
-        }
-      },
-
-      // Candidate Pair Detection: Direct (host/srflx) vs TURN Relay (Requirement 5)
-      async detectRelayType(pc) {
-        if (!pc) return 'direct';
-        try {
-          const stats = await pc.getStats();
-          for (const report of stats.values()) {
-            if (report.type === 'candidate-pair' && report.state === 'succeeded') {
-              const localCand = stats.get(report.localCandidateId);
-              const remoteCand = stats.get(report.remoteCandidateId);
-              if ((localCand && localCand.candidateType === 'relay') || (remoteCand && remoteCand.candidateType === 'relay')) {
-                return 'turn';
-              }
-            }
-          }
-        } catch (e) {}
-        return 'direct';
-      },
-
-      // Push refreshed ICE credentials to all live connections (Requirement 2)
-      pushNewIceConfigToLivePeers(iceServers) {
-        Logger.log('Applying updated iceServers to live peer connections...');
-        for (const call of this.activeCalls.values()) {
-          if (call && call.peerConnection) {
-            try {
-              call.peerConnection.setConfiguration({ iceServers });
-            } catch (e) {
-              Logger.log('setConfiguration error: ' + e.message, 'warn');
-            }
-          }
+          connectedContainer.innerHTML = active.map(p => `
+            <div class="participant-item">
+              <span>💻 <strong>${p.nickname}</strong></span>
+              <button class="btn btn-sm btn-danger" onclick="App.rejectViewer('${p.peerId}')">Kick</button>
+            </div>
+          `).join('');
         }
       },
 
       toggleAudioMute() {
-        if (!this.audioTrack) return this.showToast('No system audio track active.', 'warning');
+        if (!this.audioTrack) return this.showToast('No system audio track present.', 'warning');
         this.isAudioMuted = !this.isAudioMuted;
         this.audioTrack.enabled = !this.isAudioMuted;
         document.getElementById('btn-toggle-audio').innerText = this.isAudioMuted ? '🔇 Unmute Audio' : '🔊 Mute Audio';
@@ -1250,94 +618,36 @@
         document.getElementById('btn-toggle-video').innerText = this.isVideoPaused ? '▶️ Resume Video' : '⏸️ Pause Video';
       },
 
-      toggleLocalPreview() {
-        const wrapper = document.querySelector('.video-preview-wrapper');
-        const btn = document.getElementById('btn-toggle-preview');
-        if (wrapper.style.display === 'none') {
-          wrapper.style.display = 'flex';
-          btn.innerText = '👁️ Hide Preview';
-        } else {
-          wrapper.style.display = 'none';
-          btn.innerText = '👁️ Show Preview';
-          this.showToast('Local preview hidden (eliminates mirror loop). Broadcast is active!', 'info');
-        }
-      },
-
       copyCode() {
         navigator.clipboard.writeText(this.passcode).then(() => this.showToast('Passcode copied to clipboard!', 'success'));
       },
 
-      // Host Diagnostics Monitor Loop
-      startHostStatsMonitor() {
-        setInterval(async () => {
-          if (this.role !== 'sharer') return;
-          let hasTurn = false;
-          for (const call of this.activeCalls.values()) {
-            if (call && call.peerConnection) {
-              const type = await this.detectRelayType(call.peerConnection);
-              if (type === 'turn') hasTurn = true;
-            }
-          }
-          const relayStatusEl = document.getElementById('host-status-relay');
-          if (relayStatusEl) {
-            relayStatusEl.innerText = hasTurn ? 'TURN Relay Active' : 'Direct P2P / STUN';
-          }
-        }, 3000);
-      },
+      // Student Join
+      joinAsViewer() {
+        const code = document.getElementById('input-passcode').value.trim();
+        const nickname = document.getElementById('input-nickname').value.trim() || `PC-${Math.floor(100 + Math.random() * 900)}`;
 
-      // =======================================================================
-      // VIEWER / STUDENT WORKFLOW
-      // =======================================================================
-      async joinAsViewer() {
-        const codeInput = document.getElementById('input-passcode');
-        const nickInput = document.getElementById('input-nickname');
-
-        const code = codeInput.value.trim();
-        const rawNick = nickInput.value.trim() || `PC-${Math.floor(100 + Math.random() * 900)}`;
-        const nickname = this.escapeHtml(rawNick).slice(0, 30);
-
-        if (code.length !== 6 || !/^\d{6}$/.test(code)) {
-          this.showToast('Please enter a valid 6-digit passcode.', 'warning');
-          return;
-        }
+        if (code.length !== 6) return this.showToast('Please enter a 6-digit code.', 'warning');
 
         this.role = 'viewer';
         this.passcode = code;
-        this.currentViewerPC = null;
-
-        document.getElementById('waiting-pc-name').innerText = nickname;
-        document.getElementById('btn-join-session').disabled = true;
-
-        Logger.log(`Preparing connection to session ${code} as ${nickname}...`);
-        this.switchView('view-waiting');
-
-        const peerConfig = await this.iceManager.getPeerConfig();
         const hostPeerId = `classroom-host-${code}`;
 
-        this.peer = new Peer(null, peerConfig);
+        this.peer = new Peer(null, { debug: 1 });
 
-        this.peer.on('open', (viewerId) => {
-          Logger.log(`Assigned Viewer Peer ID: ${viewerId}`);
-          Logger.log(`Connecting to Teacher Host: ${hostPeerId}...`);
-
+        this.peer.on('open', () => {
           const conn = this.peer.connect(hostPeerId, { reliable: true });
-
           conn.on('open', () => {
-            Logger.log('Data connection to teacher host opened successfully!');
             conn.send({ type: 'JOIN_REQUEST', nickname });
-            document.getElementById('waiting-status-detail').innerText = 'Join request submitted! Waiting for teacher to approve...';
+            this.switchView('view-waiting');
           });
 
           conn.on('data', (data) => {
-            if (!data || typeof data !== 'object') return;
-
             if (data.type === 'APPROVED') {
-              Logger.log('Teacher approved join request!');
               this.switchView('view-viewer');
-              this.showViewerConnectingOverlay(true, 'Awaiting video stream from teacher...');
-              this.showToast('Approved! Connecting to screen stream...', 'success');
+              this.showToast('Connected to classroom screen stream!', 'success');
             } else if (data.type === 'REJECTED') {
-              this.showToast(data.reason || 'Join request rejected by teacher.', 'error');
+              this.showToast(data.reason || 'Join request rejected.', 'error');
               this.leaveSession();
             } else if (data.type === 'ANNOUNCEMENT') {
               this.displayAnnouncement(data.text);
@@ -1347,91 +657,22 @@
           });
 
           conn.on('close', () => {
-            Logger.log('Data connection closed by host.', 'warn');
             this.showToast('Disconnected from classroom.', 'info');
             this.leaveSession();
           });
         });
 
-        // Answer incoming media call only from verified host (Requirement 7)
         this.peer.on('call', (call) => {
-          if (call.peer !== hostPeerId) {
-            Logger.log(`Blocked call from unauthorized peer: ${call.peer}`, 'warn');
-            return;
-          }
-
-          Logger.log('Answering media call from teacher host...');
-          this.currentViewerPC = call.peerConnection;
-          this.setupViewerIceDiagnostics(call.peerConnection);
-
           call.answer();
-
           call.on('stream', (remoteStream) => {
-            Logger.log('Incoming WebRTC media stream received!');
             const video = document.getElementById('viewer-video');
             video.srcObject = remoteStream;
-
-            video.play().then(() => {
-              this.showViewerConnectingOverlay(false);
-            }).catch(() => {
-              // Autoplay blocked: show audio unlock button
+            video.play().catch(() => {
               document.getElementById('audio-unlock-overlay').style.display = 'flex';
-              this.showViewerConnectingOverlay(false);
             });
-
-            this.startViewerStatsLoop(call.peerConnection);
+            this.startStatsLoop(call.peerConnection);
           });
         });
-
-        this.peer.on('error', (err) => {
-          Logger.log(`Viewer Peer error: ${err.type} - ${err.message}`, 'err');
-          this.showToast(`Connection error: ${err.type}`, 'error');
-          this.showViewerConnectingOverlay(true, `Error: ${err.type}. Click Retry to reconnect.`);
-        });
-      },
-
-      // Viewer ICE Diagnostics & Candidate Tracking (Requirement 3 & 5)
-      setupViewerIceDiagnostics(pc) {
-        if (!pc) return;
-
-        pc.onicecandidate = (event) => {
-          if (event.candidate) {
-            const candType = event.candidate.type; // host, srflx, relay
-            Logger.log(`ICE candidate gathered: [${candType}] ${event.candidate.candidate}`);
-            Logger.recordCandidate(candType);
-          } else {
-            Logger.log('ICE candidate gathering completed.');
-          }
-        };
-
-        pc.oniceconnectionstatechange = () => {
-          const state = pc.iceConnectionState;
-          Logger.log(`ICE Connection State: ${state}`);
-          Logger.setIceState(state);
-
-          if (state === 'connected' || state === 'completed') {
-            this.showViewerConnectingOverlay(false);
-          } else if (state === 'failed') {
-            this.showViewerConnectingOverlay(true, 'ICE connection failed across network. Click Retry.');
-          } else if (state === 'disconnected') {
-            this.showViewerConnectingOverlay(true, 'Connection lost. Reconnecting...');
-          }
-        };
-      },
-
-      showViewerConnectingOverlay(show, msg = '') {
-        const overlay = document.getElementById('viewer-status-overlay');
-        const desc = document.getElementById('viewer-status-desc');
-        if (overlay) {
-          overlay.style.display = show ? 'flex' : 'none';
-          if (desc && msg) desc.innerText = msg;
-        }
-      },
-
-      retryViewerConnection() {
-        Logger.log('Retrying connection...');
-        this.leaveSession();
-        setTimeout(() => this.joinAsViewer(), 500);
       },
 
       unlockAudio() {
@@ -1443,38 +684,15 @@
         });
       },
 
-      // Viewer Real-Time WebRTC Stats (Requirement 7: Real getStats values)
-      startViewerStatsLoop(pc) {
+      startStatsLoop(pc) {
         if (!pc) return;
-        let prevBytes = 0;
-        let prevTime = 0;
-
         this.statsInterval = setInterval(async () => {
           try {
             const stats = await pc.getStats();
             stats.forEach(r => {
               if (r.type === 'inbound-rtp' && r.kind === 'video') {
-                if (r.frameWidth && r.frameHeight) {
-                  document.getElementById('hud-resolution').innerText = `${r.frameWidth}×${r.frameHeight}`;
-                }
-                if (r.framesPerSecond) {
-                  document.getElementById('hud-fps').innerText = Math.round(r.framesPerSecond);
-                }
-                // Bitrate
-                const now = r.timestamp;
-                const bytes = r.bytesReceived;
-                if (prevTime && prevBytes) {
-                  const mbps = ((bytes - prevBytes) * 8) / ((now - prevTime) / 1000) / 1_000_000;
-                  document.getElementById('hud-bitrate').innerText = `${mbps.toFixed(1)} Mbps`;
-                }
-                prevBytes = bytes;
-                prevTime = now;
-              }
-
-              if (r.type === 'candidate-pair' && r.state === 'succeeded') {
-                if (r.currentRoundTripTime) {
-                  document.getElementById('hud-latency').innerText = `${Math.round(r.currentRoundTripTime * 1000)} ms`;
-                }
+                if (r.frameWidth && r.frameHeight) document.getElementById('hud-resolution').innerText = `${r.frameWidth}×${r.frameHeight}`;
+                if (r.framesPerSecond) document.getElementById('hud-fps').innerText = Math.round(r.framesPerSecond);
               }
             });
           } catch (e) {}
@@ -1493,19 +711,12 @@
         document.getElementById('btn-viewer-mute').innerText = video.muted ? '🔇 Muted' : '🔊 Volume';
       },
 
-      // =======================================================================
-      // ANNOUNCEMENTS & FILE TRANSFERS
-      // =======================================================================
       openAnnouncementModal() { document.getElementById('modal-announcement').style.display = 'flex'; },
       closeAnnouncementModal() { document.getElementById('modal-announcement').style.display = 'none'; },
       sendAnnouncement() {
         const text = document.getElementById('announcement-input').value.trim();
         if (!text) return;
-        const safeText = this.escapeHtml(text);
-
-        this.participants.forEach(p => {
-          if (p.conn && p.status === 'approved') p.conn.send({ type: 'ANNOUNCEMENT', text: safeText });
-        });
+        this.participants.forEach(p => { if (p.conn && p.status === 'approved') p.conn.send({ type: 'ANNOUNCEMENT', text }); });
         document.getElementById('announcement-input').value = '';
         this.closeAnnouncementModal();
         this.showToast('Announcement sent to all viewers!', 'success');
@@ -1522,22 +733,11 @@
       async sendFile() {
         const file = document.getElementById('file-input').files[0];
         if (!file) return this.showToast('Please select a file.', 'warning');
-
-        // Requirement 7: 50 MB Cap Check
-        if (file.size > CONFIG.MAX_FILE_SIZE_BYTES) {
-          return this.showToast('File exceeds 50 MB maximum size limit.', 'error');
-        }
-
         const arrayBuffer = await file.arrayBuffer();
-        const safeName = this.escapeHtml(file.name);
-
         this.participants.forEach(p => {
-          if (p.conn && p.status === 'approved') {
-            p.conn.send({ type: 'FILE_BLOB', blob: arrayBuffer, fileName: safeName });
-          }
+          if (p.conn && p.status === 'approved') p.conn.send({ type: 'FILE_BLOB', blob: arrayBuffer, fileName: file.name });
         });
-
-        this.showToast(`File "${safeName}" broadcasted!`, 'success');
+        this.showToast(`File "${file.name}" broadcasted!`, 'success');
         this.closeFileModal();
       },
 
@@ -1554,29 +754,11 @@
         this.showToast(`File downloaded: ${fileName}`, 'success');
       },
 
-      // On-Screen Debug Panel Controls (Requirement 3)
-      toggleDebugPanel() {
-        const content = document.getElementById('debug-panel-content');
-        const indicator = document.getElementById('debug-toggle-indicator');
-        if (content.style.display === 'none') {
-          content.style.display = 'block';
-          indicator.innerText = '▼';
-        } else {
-          content.style.display = 'none';
-          indicator.innerText = '▶';
-        }
-      },
-
-      copyDebugLog() {
-        const text = Logger.entries.map(e => `[${e.time}] ${e.msg}`).join('\n');
-        navigator.clipboard.writeText(text).then(() => this.showToast('Debug log copied to clipboard!', 'success'));
-      },
-
       stopSharing() {
-        if (this.videoTrack) this.videoTrack.stop();
-        if (this.audioTrack) this.audioTrack.stop();
-        if (this.silentAudioTrack) this.silentAudioTrack.stop();
-        this.localStream = null;
+        if (this.localStream) {
+          this.localStream.getTracks().forEach(t => t.stop());
+          this.localStream = null;
+        }
         this.showToast('Screen sharing stopped.', 'info');
       },
 
@@ -1590,8 +772,6 @@
         if (this.peer) { this.peer.destroy(); this.peer = null; }
         if (this.statsInterval) clearInterval(this.statsInterval);
         this.participants.clear();
-        this.activeCalls.clear();
-        document.getElementById('btn-join-session').disabled = false;
         this.switchView('view-landing');
       }
     };
